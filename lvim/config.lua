@@ -10,9 +10,10 @@ an executable
 
 -- general
 lvim.log.level = "warn"
-lvim.format_on_save = true
+lvim.format_on_save.enabled = true
+vim.cmd('set bg=light')
 lvim.colorscheme = "everforest"
-vim.cmd('set background=light')
+vim.o.bg = "light"
 vim.o.guifont = "FiraCode Nerd Font"
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
@@ -45,51 +46,30 @@ lvim.leader = "space"
 --     ["<C-k>"] = actions.move_selection_previous,
 --   },
 -- }
-lvim.builtin.telescope.defaults.path_display = { "smart" }
 
-lvim.builtin.lualine.options.theme = "everforest"
-lvim.builtin.lualine.sections.lualine_y = { 'location' }
+-- Change theme settings
+-- lvim.builtin.theme.options.dim_inactive = true
+-- lvim.builtin.theme.options.style = "storm"
 
 -- Use which-key to add extra bindings with the leader-key prefix
-lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
-lvim.builtin.which_key.mappings["t"] = {
-  name = "+Trouble",
-  r = { "<cmd>Trouble lsp_references<cr>", "References" },
-  f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
-  d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
-  q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
-  l = { "<cmd>Trouble loclist<cr>", "LocationList" },
-  w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
-}
-
--- lvim.keys.normal_mode["<C-q>"] = ":q<cr>" -- or vim.keymap.set("n", "<C-q>", ":q<cr>" )
-lvim.keys.normal_mode["gwd"] = { "<cmd>lua require('goto-preview').goto_preview_definition()<CR>" }
--- lvim.keys.normal_mode["gwd"] = { "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>" }
-lvim.keys.normal_mode["gwt"] = { "<cmd>lua require('goto-preview').goto_preview_type_definition()<CR>" }
-lvim.keys.normal_mode["gwi"] = { "<cmd>lua require('goto-preview').goto_preview_implementation()<CR>" }
-lvim.keys.normal_mode["gww"] = { "<cmd>lua require('goto-preview').close_all_win()<CR>" }
--- lvim.keys.normal_mode["gwr"] = { "<cmd>lua require('goto-preview').goto_preview_references()<CR>" }
-lvim.keys.normal_mode["gwr"] = { "<cmd>lua require('telescope.builtin').lsp_references()<CR>" }
-
-function GrepInputString()
-  local default = vim.api.nvim_eval([[expand("<cword>")]])
-  local input = vim.fn.input({
-    prompt = "Search for: ",
-    default = default,
-  })
-  require("telescope.builtin").grep_string({ search = input })
-end
-
-lvim.builtin.which_key.mappings["sT"] = { "<cmd>lua GrepInputString()<CR>", "Text under cursor" }
+-- lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
+-- lvim.builtin.which_key.mappings["t"] = {
+--   name = "+Trouble",
+--   r = { "<cmd>Trouble lsp_references<cr>", "References" },
+--   f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
+--   d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
+--   q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
+--   l = { "<cmd>Trouble loclist<cr>", "LocationList" },
+--   w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
+-- }
 
 -- TODO: User Config for predefined plugins
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
 lvim.builtin.alpha.active = true
 lvim.builtin.alpha.mode = "dashboard"
-lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.setup.renderer.icons.show.git = true
+lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -108,13 +88,13 @@ lvim.builtin.treesitter.ensure_installed = {
 }
 
 lvim.builtin.treesitter.ignore_install = { "haskell" }
-lvim.builtin.treesitter.highlight.enabled = true
+lvim.builtin.treesitter.highlight.enable = true
 
 -- generic LSP settings
 
 -- -- make sure server will always be installed even if the server is in skipped_servers list
 -- lvim.lsp.installer.setup.ensure_installed = {
---     "sumeko_lua",
+--     "sumneko_lua",
 --     "jsonls",
 -- }
 -- -- change UI setting of `LspInstallInfo`
@@ -134,8 +114,6 @@ lvim.builtin.treesitter.highlight.enabled = true
 -- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "pyright" })
 -- local opts = {} -- check the lspconfig documentation for a list of all possible options
 -- require("lvim.lsp.manager").setup("pyright", opts)
-
-vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "gopls" })
 
 -- ---remove a server from the skipped list, e.g. eslint, or emmet_ls. !!Requires `:LvimCacheReset` to take effect!!
 -- ---`:LvimInfo` lists which server(s) are skipped for the current filetype
@@ -188,41 +166,59 @@ vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "gopls" })
 -- }
 
 -- Additional Plugins
+-- lvim.plugins = {
+--     {
+--       "folke/trouble.nvim",
+--       cmd = "TroubleToggle",
+--     },
+-- }
+
 lvim.plugins = {
   { "sainnhe/everforest" },
-  { "sainnhe/edge" },
-  { "folke/tokyonight.nvim" },
-  { "shaunsingh/solarized.nvim" },
   {
     "folke/trouble.nvim",
     cmd = "TroubleToggle",
   },
+  { "tpope/vim-repeat" },
   {
-    "ggandor/lightspeed.nvim",
-    event = "BufRead",
-  },
-  {
-    "rmagatti/goto-preview",
+    "ggandor/leap.nvim",
     config = function()
-      require('goto-preview').setup {}
+      require('leap').set_default_keymaps()
     end
   },
+  -- {
+  --   "rmagatti/goto-preview",
+  --   config = function()
+  --     require('goto-preview').setup {}
+  --   end
+  -- },
   {
     "simrat39/symbols-outline.nvim",
     config = function()
       require('symbols-outline').setup()
     end
   },
-  { "sindrets/diffview.nvim" },
+  -- { "sindrets/diffview.nvim" },
+  -- {
+  --   'TimUntersberger/neogit',
+  --   config = function()
+  --     require('neogit').setup {
+  --       integrations = {
+  --         diffview = true
+  --       }
+  --     }
+  --   end
+  -- },
+  { 'windwp/nvim-spectre' },
+  { 'tpope/vim-fugitive' },
   {
-    'TimUntersberger/neogit',
+    'tamton-aquib/duck.nvim',
     config = function()
-      require('neogit').setup {
-        integrations = {
-          diffview = true
-        }
-      }
+      vim.keymap.set('n', '<leader>ad', function() require("duck").hatch() end, {})
+      vim.keymap.set('n', '<leader>ak', function() require("duck").cook() end, {})
+      vim.keymap.set('n', '<leader>ac', function() require("duck").hatch("🐈", 0.75) end, {}) -- Quite a mellow cat
     end
+
   },
 }
 
